@@ -13,7 +13,8 @@ services:
         condition: "service_healthy"
     environment:
       TZ: "Asia/Tokyo"
-      MYSQL_HOST: dockerMySQL
+      APP_PORT: "3000"
+      DB_PORT: "3306"
 
     command: bash -c "go mod tidy && go build -o app && ./app"
 
@@ -22,7 +23,6 @@ services:
       context: ./docker
       dockerfile: mysql.Dockerfile
     platform: linux/x86_64
-    container_name: dockerMySQL
     volumes:
       - mysql_data:/var/lib/mysql
       - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf

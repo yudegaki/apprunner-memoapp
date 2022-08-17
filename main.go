@@ -18,5 +18,5 @@ func main() {
 	r.Use(middleware.Transaction())
 	middleware.Router(r)
 
-	r.Run(fmt.Sprintf(":%d", config.Port))
+	r.Run(fmt.Sprintf(":%d", config.APP_PORT))
 }
