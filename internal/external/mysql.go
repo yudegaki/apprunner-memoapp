@@ -2,7 +2,6 @@ package external
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/yudegaki/apprunner-memoapp/internal/config"
 	"github.com/yudegaki/apprunner-memoapp/internal/repositories"
@@ -20,24 +19,30 @@ func InitDB() {
 	dbName := config.DB_NAME
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", user, password, host, port, dbName)
-	log.Default().Println(dsn)
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
 	DB = db
-	migrate()
 	Initialize()
 }
 
-func migrate() {
-	DB.AutoMigrate(&repositories.User{})
-	DB.AutoMigrate(&repositories.Post{})
+func Initialize() {
+	if exist := DB.Migrator().HasTable(&repositories.User{}); !exist {
+		userInitialize()
+	}
+	if exist := DB.Migrator().HasTable(&repositories.Post{}); !exist {
+		postInitialize()
+	}
 }
 
-func Initialize() {
-	// User initialization
+func userInitialize() {
+	// Delete table
+	DB.Migrator().DropTable(&repositories.User{})
+	// Create table
+	DB.AutoMigrate(&repositories.User{})
+	// Initialize table
 	for i := 1; i < 10; i++ {
 		tmp := repositories.User{
 			Name:     fmt.Sprintf("user%d", i),
@@ -45,7 +50,14 @@ func Initialize() {
 		}
 		DB.Create(&tmp)
 	}
-	// Post initialization
+}
+
+func postInitialize() {
+	// Delete table
+	DB.Migrator().DropTable(&repositories.Post{})
+	// Create table
+	DB.AutoMigrate(&repositories.Post{})
+	// Initialize table
 	for i := 1; i < 20; i++ {
 		tmp := repositories.Post{
 			Title: fmt.Sprintf("POST-%d", i),
