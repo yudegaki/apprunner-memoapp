@@ -33,12 +33,24 @@ func InitDB() {
 
 func migrate() {
 	DB.AutoMigrate(&repositories.User{})
+	DB.AutoMigrate(&repositories.Post{})
 }
 
 func Initialize() {
 	// User initialization
 	for i := 1; i < 10; i++ {
-		tmp := repositories.User{Name: fmt.Sprintf("user%d", i), Password: fmt.Sprintf("password%d", i)}
+		tmp := repositories.User{
+			Name:     fmt.Sprintf("user%d", i),
+			Password: fmt.Sprintf("password%d", i),
+		}
+		DB.Create(&tmp)
+	}
+	// Post initialization
+	for i := 1; i < 20; i++ {
+		tmp := repositories.Post{
+			Title: fmt.Sprintf("POST-%d", i),
+			Body:  fmt.Sprintf("HELLO WORLD HOGE FUGA PIYO %d", i),
+		}
 		DB.Create(&tmp)
 	}
 }
