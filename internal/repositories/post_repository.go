@@ -68,8 +68,10 @@ func (r *PostRepository) Update(post *entities.Post) error {
 }
 
 func (r *PostRepository) Delete(id uint) error {
-	if err := r.Conn.Delete(&Post{}, id).Error; err != nil {
-		return err
+	if db := r.Conn.Delete(&Post{}, id); db.Error != nil {
+		return db.Error
+	} else if db.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
 	}
 	return nil
 }
