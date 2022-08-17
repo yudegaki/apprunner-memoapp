@@ -1,0 +1,43 @@
+version: "3.9"
+services:
+  app:
+    build:
+      context: ./docker
+      dockerfile: "api.Dockerfile"
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: "service_healthy"
+    environment:
+      TZ: "Asia/Tokyo"
+      MYSQL_HOST: dockerMySQL
+
+    command: bash -c "go mod tidy && go build -o app && ./app"
+
+  db:
+    build:
+      context: ./docker
+      dockerfile: mysql.Dockerfile
+    platform: linux/x86_64
+    container_name: dockerMySQL
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: memoapp
+      MYSQL_ROOT_PASSWORD: password
+
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  mysql_data:
