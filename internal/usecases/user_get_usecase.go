@@ -9,8 +9,8 @@ type GetUserUsecase struct {
 	repository interfaces.UserRepository
 }
 
-func NewGetUserUsecase(r interfaces.UserRepository) *GetUsersUsecase {
-	return &GetUsersUsecase{
+func NewGetUserUsecase(r interfaces.UserRepository) *GetUserUsecase {
+	return &GetUserUsecase{
 		repository: r,
 	}
 }
